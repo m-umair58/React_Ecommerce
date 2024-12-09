@@ -6,9 +6,12 @@ function Checkout({ cart }) {
     name: "",
     email: "",
     address: "",
+    Phone_Number:"",
     city: "",
     postalCode: "",
   });
+
+  console.log(cart)
 
   const navigate = useNavigate(); // Initialize useNavigate
   let totalAmount = cart.reduce(
@@ -27,7 +30,7 @@ function Checkout({ cart }) {
 
   const handleProceedToPay = () => {
     console.log("Order Details:", { cart, formData });
-    navigate("/payment", { state: { amount: totalAmount,cart } }); // Navigate to /payments page
+    navigate("/payment", { state: { amount: totalAmount,cart,formData } }); // Navigate to /payments page
   };
 
   return (
@@ -76,6 +79,25 @@ function Checkout({ cart }) {
                 required
                 className="w-full bg-gray-800 text-gray-200 border border-gray-700 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Your Email"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="Phone_Number"
+                className="block text-sm font-medium mb-2"
+              >
+                Phone_Number
+              </label>
+              <input
+                type="text"
+                id="Phone_Number"
+                name="Phone_Number"
+                value={formData.Phone_Number}
+                onChange={handleChange}
+                required
+                className="w-full bg-gray-800 text-gray-200 border border-gray-700 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="+92 YXX-XXXXXX"
               />
             </div>
 

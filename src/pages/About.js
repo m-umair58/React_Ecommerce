@@ -1,8 +1,10 @@
+import Sidebar from "../components/Sidebar";
 import React from "react";
 
-function About() {
+function About({ isSidebarVisible, toggleSidebar}) {
   return (
     <div className="w-full min-h-screen bg-gray-900 text-gray-200 p-8">
+      <Sidebar isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-6">About Us</h1>
         <p className="text-gray-400 leading-relaxed mb-6">

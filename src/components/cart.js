@@ -14,7 +14,7 @@ function Cart({ cart, setCart }) {
     );
     setCart(updatedCart);
   };
-
+  console.log(cart);
   return (
     <div className="w-full p-4 px-20 bg-gray-900 text-gray-200 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-white">Your Cart</h1>
