@@ -111,7 +111,7 @@ export default function Home({ isSidebarVisible, toggleSidebar, cart, setCart })
 
 
 export const productsLoader = async()=>{
-  const res = await fetch('nestecommerce-production.up.railway.app/products')
+  const res = await fetch('https://nestecommerce-production.up.railway.app/products')
 
   return res.json()
 }
