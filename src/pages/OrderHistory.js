@@ -15,7 +15,7 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
         setLoading(true);
         const token = localStorage.getItem("accessToken");
 
-        const response = await fetch("http://localhost:8000/users/me", {
+        const response = await fetch("https://nestecommerce-production.up.railway.app/users/me", {
           method: "GET", // or POST, PUT, etc.
           headers: {
             Authorization: `Bearer ${token}`,
@@ -27,7 +27,7 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
 
         // Fetch orders (this should include product IDs)
         const ordersResponse = await fetch(
-          `http://localhost:8000/orderdetails/${data.id}`,
+          `https://nestecommerce-production.up.railway.app/orderdetails/${data.id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -49,7 +49,7 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
         const fetchedProducts = {};
         for (const productId of productIds) {
           const productResponse = await fetch(
-            `http://localhost:8000/products/${productId}`,
+            `https://nestecommerce-production.up.railway.app/products/${productId}`,
             {
               method: "GET",
               headers: {

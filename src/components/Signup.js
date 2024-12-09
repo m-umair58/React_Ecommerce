@@ -19,7 +19,7 @@ const SignupPage = () => {
     // Example API call to handle signup
     try {
       // You can replace this with your API request to the backend
-      const response = await fetch("http://localhost:8000/auth/signup", {
+      const response = await fetch("https://nestecommerce-production.up.railway.app/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -21,7 +21,7 @@ const PaymentForm = ({ setCart }) => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("accessToken");
-  fetch("http://localhost:8000/users/me", {
+  fetch("https://nestecommerce-production.up.railway.app/users/me", {
     method: "GET", // or POST, PUT, etc.
     headers: {
       Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const PaymentForm = ({ setCart }) => {
 
       // Send the paymentMethod and amount to the backend
       const response = await fetch(
-        "http://localhost:8000/payment/create-payment-intent",
+        "https://nestecommerce-production.up.railway.app/payment/create-payment-intent",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -72,7 +72,7 @@ const PaymentForm = ({ setCart }) => {
         setCart([]);
         // is the payment is successfull we can now but order details in our db;
         const response = await fetch(
-          "http://localhost:8000/orderDetails/create",
+          "https://nestecommerce-production.up.railway.app/orderDetails/create",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -88,7 +88,7 @@ const PaymentForm = ({ setCart }) => {
         const resData = await response.json();
         // console.log('--------',resData);
 
-        fetch("http://localhost:8000/billing-details/create", {
+        fetch("https://nestecommerce-production.up.railway.app/billing-details/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

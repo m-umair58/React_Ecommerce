@@ -18,7 +18,7 @@ const LoginPage = () => {
     // Example API call to handle login
     try {
       // Replace this with your actual API endpoint
-      const response = await fetch("http://localhost:8000/auth/signin", {
+      const response = await fetch("https://nestecommerce-production.up.railway.app/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
