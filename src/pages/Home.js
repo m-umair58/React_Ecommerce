@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Link, useLoaderData } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
-export default function Home({ isSidebarVisible, toggleSidebar, cart, setCart }) {
+export default function Home({
+  isSidebarVisible,
+  toggleSidebar,
+  cart,
+  setCart,
+}) {
   const products = useLoaderData();
   const [notification, setNotification] = useState(""); // Notification message
   // Function to add product to cart
@@ -34,9 +39,11 @@ export default function Home({ isSidebarVisible, toggleSidebar, cart, setCart })
         </div>
       )}
 
-       {/* Sidebar */}
-      <Sidebar isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
-       
+      {/* Sidebar */}
+      <Sidebar
+        isSidebarVisible={isSidebarVisible}
+        toggleSidebar={toggleSidebar}
+      />
 
       {/* Main Content */}
       <main className="flex-1 bg-gray-900 p-8 h-screen overflow-y-auto">
@@ -109,9 +116,11 @@ export default function Home({ isSidebarVisible, toggleSidebar, cart, setCart })
   );
 }
 
+export const productsLoader = async () => {
+  const url = "https://nestecommerce-production.up.railway.app/products";
+  console.log(url);
+  const res = await fetch(url);
+  const data = await res.json();
 
-export const productsLoader = async()=>{
-  const res = await fetch('https://nestecommerce-production.up.railway.app/products')
-
-  return res.json()
-}
+  return data;
+};
