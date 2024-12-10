@@ -77,8 +77,15 @@ function App() {
           }
           loader={productsLoader}
         />
-        <Route path="/about" element={<About isSidebarVisible={isSidebarVisible} 
-              toggleSidebar={toggleSidebar}/>} />
+        <Route
+          path="/about"
+          element={
+            <About
+              isSidebarVisible={isSidebarVisible}
+              toggleSidebar={toggleSidebar}
+            />
+          }
+        />
         <Route path="/contact" element={<Contact />} />
         <Route
           path="/products/headphones"
@@ -118,8 +125,16 @@ function App() {
         />
         <Route
           path="/order-history"
-          element={<OrderHistory cart={cart} setCart={setCart} isSidebarVisible={isSidebarVisible}
-          toggleSidebar={toggleSidebar}/>}
+          element={
+            <ProtectedRoute>
+              <OrderHistory
+                cart={cart}
+                setCart={setCart}
+                isSidebarVisible={isSidebarVisible}
+                toggleSidebar={toggleSidebar}
+              />
+            </ProtectedRoute>
+          }
           // loader={usersData}
           // loader={orderLoader}
         />
