@@ -33,89 +33,96 @@ const PaymentForm = ({ setCart }) => {
       setUserId(data.id);
     })
     .catch((error) => console.error("Error:", error));
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    // console.log(userId);
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // Create payment method with card details
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: "card",
-        card: elements.getElement(CardElement),
-      });
-
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-        return;
-      }
-
-      // Send the paymentMethod and amount to the backend
-      const response = await fetch(
-        "https://nestecommerce-production.up.railway.app/payment/create-payment-intent",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount }),
+    const handleSubmit = async (event) => {
+      event.preventDefault();
+      if (!stripe || !elements) return;
+    
+      setLoading(true);
+      setError(null);
+    
+      try {
+        // Step 1: Create Payment Method
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+          type: "card",
+          card: elements.getElement(CardElement),
+        });
+    
+        if (error) {
+          setError(error.message);
+          setLoading(false);
+          return;
         }
-      );
-      const paymentResult = await response.json();
-      if (paymentResult.error) {
-        setError(paymentResult.error);
-      } else if (paymentResult) {
-        setSuccess(true);
-        setCart([]);
-        // is the payment is successfull we can now but order details in our db;
-        const response = await fetch(
+    
+        // Step 2: Create Payment Intent
+        const paymentResponse = await fetch(
+          "https://nestecommerce-production.up.railway.app/payment/create-payment-intent",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount }),
+          }
+        );
+    
+        const paymentResult = await paymentResponse.json();
+        if (paymentResult.error) {
+          throw new Error(paymentResult.error);
+        }
+    
+        // Step 3: Create Order
+        const orderResponse = await fetch(
           "https://nestecommerce-production.up.railway.app/orderDetails/create",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-               userId:userId,
-               productId:Object.values(cart).map(item => item.id),
-               productQuantity:Object.values(cart).map(item => item.quantity),
-               status:"pending" 
-              }),
+              userId,
+              productId: cart.map((item) => item.id),
+              productQuantity: cart.map((item) => item.quantity),
+              status: "pending",
+            }),
           }
         );
-        // console.log(response);
-        const resData = await response.json();
-        // console.log('--------',resData);
-
-        fetch("https://nestecommerce-production.up.railway.app/billing-details/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-             name: formData.name,
-             email: formData.email,
-             address:formData.address,
-             Phone_Number:formData.Phone_Number,
-             city:formData.city,
-             postalCode:Number(formData.postalCode),
-             orderId:resData.id,
-             userId 
+    
+        const orderData = await orderResponse.json();
+        if (!orderResponse.ok) {
+          throw new Error("Failed to create order.");
+        }
+    
+        // Step 4: Save Billing Details
+        const billingResponse = await fetch(
+          "https://nestecommerce-production.up.railway.app/billing-details/create",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: formData.name,
+              email: formData.email,
+              address: formData.address,
+              Phone_Number: formData.Phone_Number,
+              city: formData.city,
+              postalCode: Number(formData.postalCode),
+              orderId: orderData.id,
+              userId,
             }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-        })
-        
-        navigate('/order-completion',{state:{orderId:resData.id}})
+          }
+        );
+    
+        if (!billingResponse.ok) {
+          throw new Error("Failed to save billing details.");
+        }
+    
+        // Step 5: Navigate to Order Completion Page
+        setCart([]); // Clear the cart
+        setSuccess(true);
+        navigate("/order-completion", { state: { orderId: orderData.id } });
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.log(err.message);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">

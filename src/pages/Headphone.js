@@ -1,9 +1,10 @@
-import { Link ,useLoaderData} from "react-router-dom";
+import { useLoaderData,useNavigate} from "react-router-dom";
 import Sidebar from '../components/Sidebar'
 
 function Home({ isSidebarVisible, toggleSidebar, cart, setCart }) {
   // Function to add product to cart
   const products = useLoaderData();
+  const navigate = useNavigate();
   const addToCart = (product) => {
     const existingProductIndex = cart.findIndex(
       (item) => item.id === product.id
@@ -19,6 +20,10 @@ function Home({ isSidebarVisible, toggleSidebar, cart, setCart }) {
     }
   };
 
+  const handleProductDetails = ((productId)=>{
+    navigate('../product-details',{ state: { products,productId } })
+  })
+
   return (
     <div className="flex w-full bg-gray-900 text-gray-200">
       {/* Sidebar */}
@@ -28,27 +33,7 @@ function Home({ isSidebarVisible, toggleSidebar, cart, setCart }) {
       <main className="flex-1 bg-gray-900 p-8 h-screen overflow-y-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-white">Our Products</h1>
-          {/* Sidebar toggle button visible at all times */}
-          {/* <button
-            onClick={toggleSidebar}
-            className="bg-gray-700 text-white p-3 rounded-xl focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button> */}
-        </div>
+          </div>
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -58,6 +43,7 @@ function Home({ isSidebarVisible, toggleSidebar, cart, setCart }) {
                 <div
                   key={product.id}
                   className="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition duration-300 ease-in-out flex flex-col h-full"
+                  onClick={() =>handleProductDetails(product.id)}
                 >
                   <div className="relative">
                     <img
@@ -103,7 +89,10 @@ function Home({ isSidebarVisible, toggleSidebar, cart, setCart }) {
 
                     {/* Add to Cart Button */}
                     <button
-                      onClick={() => addToCart(product)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent the outer div's onClick from being triggered
+                        addToCart(product);
+                      }}
                       className="w-full mt-4 bg-blue-600 text-white py-3 rounded-md shadow-md hover:bg-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
                     >
                       Add to Cart

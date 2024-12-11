@@ -1,13 +1,13 @@
 import Sidebar from "../components/Sidebar";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, setCart }) {
-  // console.log(userData)
+export default function OrderHistory({ isSidebarVisible, toggleSidebar, cart, setCart }) {
   const [orders, setOrders] = useState([]); // Store orders
   const [products, setProducts] = useState({}); // Store fetched product details
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -16,16 +16,15 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
         const token = localStorage.getItem("accessToken");
 
         const response = await fetch("https://nestecommerce-production.up.railway.app/users/me", {
-          method: "GET", // or POST, PUT, etc.
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
         const data = await response.json();
-        // console.log(data.id)
 
-        // Fetch orders (this should include product IDs)
+        // Fetch orders
         const ordersResponse = await fetch(
           `https://nestecommerce-production.up.railway.app/orderdetails/${data.id}`,
           {
@@ -41,11 +40,9 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
         setOrders(ordersData);
 
         // Extract product IDs from orders
-        const productIds = [
-          ...new Set(ordersData.flatMap((order) => order.productId)),
-        ];
+        const productIds = [...new Set(ordersData.flatMap((order) => order.productId))];
 
-        // Fetch products one by one
+        // Fetch products
         const fetchedProducts = {};
         for (const productId of productIds) {
           const productResponse = await fetch(
@@ -62,7 +59,6 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
           }
 
           const productData = await productResponse.json();
-          console.log(productData);
           fetchedProducts[productId] = productData;
 
           // Update state as products are fetched
@@ -81,33 +77,43 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
     fetchOrders();
   }, []);
 
-  if (loading) return <div className="text-white">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+        <div className="w-16 h-16 border-4 border-t-4 border-gray-200 border-t-white rounded-full animate-spin">|</div>
+        <span className="text-white mt-4">Loading</span>
+      </div>
+    );
+  }
+  
+
   if (error) return <div className="text-white">Error: {error}</div>;
 
   const handleReorder = (order) => {
-    const updatedCart = [...cart]; // Start with the current cart
-  
+    const updatedCart = [...cart];
+
     order.productId.forEach((id, idx) => {
-      const product = products[id]; // Get the product from the products list
+      const product = products[id];
       if (product) {
         const existingProductIndex = updatedCart.findIndex((item) => item.id === product.id);
-  
+
         if (existingProductIndex >= 0) {
-          // If the product is already in the cart, update the quantity
           updatedCart[existingProductIndex].quantity += order.productQuantity[idx];
         } else {
-          // Add the product with the original quantity from the order
           updatedCart.push({ ...product, quantity: order.productQuantity[idx] });
         }
       } else {
         console.warn(`Product with ID ${id} not found.`);
       }
     });
-  
-    setCart(updatedCart); // Update the cart once with all changes
+
+    setCart(updatedCart);
   };
-  
-  
+
+  const handleViewOrderDetails = (order) => {
+    navigate(`/order-details`, { state: { order,products } });
+  };
+
   return (
     <div className="min-h-screen p-16 bg-gray-900 text-white">
       <Sidebar isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
@@ -116,13 +122,9 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
         <h2 className="text-3xl font-bold mb-4">Order History</h2>
         {orders.length > 0 ? (
           orders.map((order) => (
-            <div
-              key={order.id}
-              className="mb-6 bg-gray-800 p-4 rounded-lg shadow-md"
-            >
+            <div key={order.id} className="mb-6 bg-gray-800 p-4 rounded-lg shadow-md" onClick={() => handleViewOrderDetails(order)}>
               <h3 className="text-xl font-semibold mb-2">Order #{order.id}</h3>
               <p>Status: {order.status}</p>
-              {/* <p>User ID: {order.userId}</p> */}
               <p className="mt-2 font-medium">Products:</p>
               <ul className="mt-2">
                 {order.productId.map((id, idx) => {
@@ -138,9 +140,7 @@ export default function OrderHistory({isSidebarVisible, toggleSidebar, cart, set
                           />
                           <div>
                             <p className="font-bold">{product.name}</p>
-                            <p className="text-gray-400">
-                              Quantity: {order.productQuantity[idx]}
-                            </p>
+                            <p className="text-gray-400">Quantity: {order.productQuantity[idx]}</p>
                           </div>
                         </>
                       ) : (

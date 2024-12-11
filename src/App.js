@@ -25,7 +25,8 @@ import RootLayout from "./layouts/RootLayout";
 import { RouterProvider } from "react-router-dom";
 import OrderHistory from "./pages/OrderHistory";
 import ThanksPage from "./pages/ThanksPage";
-
+import OrderDetails from "./pages/OrderDetails";
+import ProductDetails from "./pages/ProductDetails";
 const stripePromise = loadStripe(
   "pk_test_51QQBJ7DFsAtJprlufxmTo34xeSYff41lqSo9BJPNnfCiJHBjHyaok0VPnbsSxjaNj0m3w1neK81SMH6Kc1QGjtxo003bCrpMqO"
 );
@@ -165,6 +166,28 @@ function App() {
             <Elements stripe={stripePromise}>
               <PaymentPage setCart={setCart} />
             </Elements>
+          }
+        />
+        <Route
+          path="/order-details"
+          element={
+            <ProtectedRoute>
+              <OrderDetails
+                isSidebarVisible={isSidebarVisible}
+                toggleSidebar={toggleSidebar}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/product-details"
+          element={
+            <ProductDetails
+              isSidebarVisible={isSidebarVisible}
+              toggleSidebar={toggleSidebar}
+              cart={cart}
+              setCart={setCart}
+            />
           }
         />
       </Route>

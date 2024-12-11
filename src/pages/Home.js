@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useNavigate, useLoaderData } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
 export default function Home({
@@ -9,6 +9,7 @@ export default function Home({
   setCart,
 }) {
   const products = useLoaderData();
+  const navigate = useNavigate();
   const [notification, setNotification] = useState(""); // Notification message
   // Function to add product to cart
   const addToCart = (product) => {
@@ -29,6 +30,10 @@ export default function Home({
     setNotification(`${product.name} added to cart`);
     setTimeout(() => setNotification(""), 3000); // Hide after 3 seconds
   };
+
+  const handleProductDetails = ((productId)=>{
+    navigate('product-details',{ state: { products,productId } })
+  })
 
   return (
     <div className="flex w-full bg-gray-900 text-gray-200 ">
@@ -55,11 +60,13 @@ export default function Home({
         {products.length === 0 ? (
           <p className="text-center text-gray-400">No products available</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+          >
             {products.map((product) => (
               <div
                 key={product.id}
                 className="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition duration-300 ease-in-out flex flex-col h-full"
+                onClick={() =>handleProductDetails(product.id)}
               >
                 <div className="relative">
                   <img
@@ -105,7 +112,10 @@ export default function Home({
 
                   {/* Add to Cart Button */}
                   <button
-                    onClick={() => addToCart(product)}
+                     onClick={(e) => {
+                      e.stopPropagation(); // Prevent the outer div's onClick from being triggered
+                      addToCart(product);
+                    }}
                     className="w-full mt-4 bg-blue-600 text-white py-3 rounded-md shadow-md hover:bg-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
                   >
                     Add to Cart
